@@ -15,10 +15,6 @@ class Blogs::PostsController < Blogs::BaseController
         .not_page
         .order(published_at: :desc)
     )
-
-    # Cache index page based on most recently updated post
-    expires_in 5.minutes, public: true
-    fresh_when(@blog.posts.published.maximum(:updated_at), public: true)
   end
 
   def show
@@ -28,12 +24,7 @@ class Blogs::PostsController < Blogs::BaseController
         format.any { head :not_found }
       end
     else
-      expires_in 5.minutes, public: true
-      # stale? returns true if we need to render, false if returning 304
-      # Only eager load rich text content if we're actually going to render
-      if stale?(@post, public: true)
-        @post = @blog.posts.published.includes(:rich_text_body_content).find(@post.id)
-      end
+      @post = @blog.posts.published.includes(:rich_text_body_content).find(@post.id)
     end
   end
 
