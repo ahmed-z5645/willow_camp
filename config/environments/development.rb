@@ -45,6 +45,13 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = {host: "localhost", port: 3000}
 
+  # Ensure ActiveStorage can generate URLs for JSON responses
+  config.action_controller.default_url_options = { host: "localhost", port: 3000 }
+  
+  # Force the Router to know the host. This fixes the DiskService crash.
+  # line 49 was not generating url, did not attach a host url, so going to set globally in development mode
+  Rails.application.routes.default_url_options = { host: "localhost", port: 3000 }
+
   # Configure letter opener for development environment
   config.action_mailer.delivery_method = :letter_opener
   config.action_mailer.perform_deliveries = true

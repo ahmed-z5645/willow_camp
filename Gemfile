@@ -64,6 +64,7 @@ gem "honeybadger", "~> 6.1.2"  # For error monitoring
 
 # Rate limiting and security
 gem "rack-attack"
+gem "rack-cors"
 
 gem "amazing_print"
 gem "rails_semantic_logger"
