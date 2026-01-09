@@ -1,7 +1,7 @@
 # ABOUTME: Override Active Storage direct uploads to properly set public ACL header
 # ABOUTME: Ensures images uploaded via Marksmith are publicly accessible on Digital Ocean Spaces
 
-class ActiveStorage::DirectUploadsController < ActiveStorage::BaseController
+class ActiveStorage::DirectUploadsController < ActiveStorage::ApplicationController
   def create
     blob = ActiveStorage::Blob.create_before_direct_upload!(**blob_args)
 
@@ -16,7 +16,15 @@ class ActiveStorage::DirectUploadsController < ActiveStorage::BaseController
   private
 
   def blob_args
-    params.require(:blob).permit(:filename, :byte_size, :checksum, :content_type, metadata: {}).to_h.symbolize_keys
+    args = params.require(:blob).permit(:filename, :byte_size, :checksum, :content_type, metadata: {}).to_h.symbolize_keys
+
+    args[:metadata] ||= {}
+
+    if defined?(current_user) && current_user.present?
+      args[:metadata][:uploader_id] = current_user.id
+    end
+
+    args
   end
 
   def direct_upload_json(blob)
